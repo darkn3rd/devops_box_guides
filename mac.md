@@ -612,6 +612,96 @@ gem update --system
 gem install bundler
 ```
 
+## **Server Test Tools**
+
+These are tools that can be used to test a server.
+
+### **Serverspec**
+
+[ServerSpec](http://serverspec.org/) is a framework that allows utilization of *RSpec tests for checking your servers are configured correctly*.  The can execute commands locally, through SSH, WinRM, or Docker API.  
+
+First install `ruby` on Windows (see above section), then in either Command Shell (CMD.EXE) or PowerShell run this:
+
+```bash
+gem install serverspec
+# Initialize framework
+serverspec-init
+```
+
+This will create a directory structure similar below, where `$HOSTNAME` is either localhost, a remote host name, or vagrant virtual guest machine name depending on what options were selected with `serverspec-init`.  Tests are organized by the hostname of the target hosts, with an example tests in `sample_spec.rb`:
+
+```bash
+.
+├── Rakefile
+└─── spec
+    ├── $HOSTNAME
+    │   └── sample_spec.rb
+    ├── README.md
+    └── spec_helper.rb
+```
+
+As an example, a test would look something like this:
+
+```ruby
+# Test Vagrant Image
+describe 'Vagrant Image Tests' do
+  describe user('vagrant') do
+    it { should exist }
+    it { should belong_to_group 'vagrant' }
+  end
+end
+```
+
+After crafting some tests, you can run them using `rake spec` command, or manually using `TARGET_HOST=$HOSTNAME rspec` command.
+
+### **InSpec**
+
+[InSpec](https://www.inspec.io/) is a framework to create infrastructure tests for integration or compliance testing and is marketed as *compliance as code*.  The tests are organized in a test profile, which can be initially created with `inspec init profile NAME`.  
+
+Inspec uses similar syntax to ServerSpec, but is not feature parity with ServerSpec.  Execution of test scripts is done manually using `inspec` command.  There is no further automation to orchestrate tests directly [Vagrant](https://www.vagrantup.com/) or [Docker](https://www.docker.com/), so this will have to be created manually.  There is integration through [TestKitchen](http://kitchen.ci/) tool.
+
+First install `ruby` on Windows (see above section), then in either Command Shell (CMD.EXE) or PowerShell run this:
+
+```bash
+gem install inspec
+# Initialize profile
+inspec init profile $PROFILENAME
+```
+
+This will create the following structure, with some example tests in `example.rb`
+```bash
+.
+└─── $PROFILENAME
+    ├── controls
+    │   └── example.rb
+    ├── inspec.yml
+    ├── libraries
+    └── README.md
+```
+
+As an example, a control could look something like this:
+
+```ruby
+# Test Vagrant Image
+control 'vagrant-image' do
+  title 'Vagrant Image Tests'
+  desc 'Test the vagrant image requirements'
+  describe user('vagrant') do
+    it { should exist }
+    its('groups') { should include('vagrant') }
+  end
+end
+```
+
+After crafting some tests, you can run them using `inspec exec` command, for example:
+
+```bash
+inspec exec $PROFILENAME/ \
+        -t ssh://$TARGET_USER@$TARGET_HOST \
+        -p $TARGET_PORT \
+        -i $TARGET_IDENTITYFILE
+```
+
 ## **Advanced Tools**
 
 ### **Change Configuration Tools**
