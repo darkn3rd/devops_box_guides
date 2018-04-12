@@ -501,6 +501,56 @@ The default package on Ubuntu Xenial is for Puppet Agent 3.8.5 (Oct. 2017).
 sudo apt install puppet
 ```
 
+#### **Puppet 5.x**
+
+**Created:** 2018年4月12日
+
+If you have puppet installed already, you should remove it: `sudo apt-get purge puppet`
+
+This is how you can install the latest from Puppet:
+
+ * Puppet 5 Agent - https://puppet.com/blog/puppet-5-platform-released
+ * Bolt - https://puppet.com/products/puppet-bolt
+ * PDK - https://github.com/puppetlabs/pdk/blob/master/LICENSE
+
+
+```bash
+sudo apt-key adv \
+  --keyserver "hkp://pgp.mit.edu" \
+  --recv-keys "EF8D349F"
+
+# Add entry for Puppet Repository
+echo "deb http://apt.puppetlabs.com $(lsb_release -c -s) puppet5" \
+  | sudo tee -a /etc/apt/sources.list.d/puppet5.list
+
+# Install Puppet from Puppet Repository
+sudo apt-get update && sudo apt-get install -y puppet-agent bolt pdk
+
+# Make binaries accessible
+for ITEM in /opt/puppetlabs/bin/*; do
+  if [[ "$(lsb_release -c -s)" == "trusty" ]]; then
+    [[ ${ITEM##*/} == bolt ]] && continue
+  fi
+  sudo ln -sf \
+    /opt/puppetlabs/puppet/bin/wrapper.sh /usr/bin/${ITEM##*/}
+done
+```
+
+After we can check versions of the tools installed:
+
+```bash
+puppet_versions() {
+  printf "puppet: %5s\n" $(puppet --version)
+  printf "facter: %5s\n" "$(facter --version | cut -f1 -d' ')"
+  printf "hiera: %6s\n" "$(hiera --version)"
+  printf "mco: %9s\n" "$(mco --version | cut -f2 -d' ')"
+  command bolt > /dev/null 2>&1 && printf "bolt: %8s\n" "$(bolt --version)"
+  command pdk > /dev/null 2>&1 && printf "pdk: %9s\n" "$(bolt --version)"
+}
+
+puppet_versions
+```
+
 #### **ChefDK**
 
 The [ChefDK](https://downloads.chef.io/chefdk) bundles several tools used with Chef, so that they do not have to be installed invidually.  It comes with its own embedded Ruby.
@@ -600,9 +650,11 @@ aws_secret_access_key = REDACTED
 
 ### **HashiCorp Tools: Howbow Dah**
 
+**Updated:** 2018年4月12日
+
 ```bash
 # Consul
-VERSION='0.8.4'
+VERSION='1.0.6'
 PACKAGE="consul_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/consul/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
@@ -610,7 +662,7 @@ sudo mv consul /usr/local/bin/
 
 
 # Consul-Template
-VERSION='0.18.5'
+VERSION='0.19.4'
 PACKAGE="consul-template_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/consul-template/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
@@ -618,28 +670,28 @@ sudo mv consul-template /usr/local/bin/
 
 
 # Nomad
-VERSION='0.5.6'
+VERSION='0.8.0'
 PACKAGE="nomad_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/nomad/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
 sudo mv nomad /usr/local/bin/
 
 # Vault
-VERSION='0.7.3'
+VERSION='0.10.0'
 PACKAGE="vault_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/vault/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
 sudo mv vault /usr/local/bin/
 
 # Packer
-VERSION='1.1.1'
+VERSION='1.2.2'
 PACKAGE="packer_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/packer/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
 sudo mv packer /usr/local/bin/
 
 # Terraform
-VERSION='0.10.8'
+VERSION='0.11.7'
 PACKAGE="terraform_${VERSION}_linux_amd64.zip"
 curl -O https://releases.hashicorp.com/terraform/${VERSION}/${PACKAGE}
 unzip ${PACKAGE}
