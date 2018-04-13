@@ -13,16 +13,19 @@ Codename:	xenial
 
 ### **Essential GNU Tools**
 
+* **Updated:** 2018年4月12日
+
 Linux is already bundled with desirable tools like GNU Sed and GNU Awk.  Here are some other small tools you may want to use:
 
 ```bash
 # Basic Essentials
 sudo apt install tree
 # Useful tools
-sudo apt install xml2
-sudo apt install jq
-sudo apt install sqlite3
-sudo apt install ngrep
+sudo apt install xml2              # convert xml to usable format
+sudo apt install jq                # json pretty + filter
+sudo apt install sqlite3           # small sql db from binary file
+sudo apt install ngrep             # network grep
+sudo apt install silversearcher-ag # super grep on roids
 ```
 
 ## **Vagrant and Docker**
