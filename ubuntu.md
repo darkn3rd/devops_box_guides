@@ -503,7 +503,7 @@ sudo apt install puppet
 
 #### **Puppet 5.x**
 
-**Created:** 2018年4月12日
+* **Created:** 2018年4月12日
 
 If you have puppet installed already, you should remove it: `sudo apt-get purge puppet`
 
@@ -553,15 +553,28 @@ puppet_versions
 
 #### **ChefDK**
 
+* **Updated:** 2018年4月12日
+
 The [ChefDK](https://downloads.chef.io/chefdk) bundles several tools used with Chef, so that they do not have to be installed invidually.  It comes with its own embedded Ruby.
 
 ```bash
 # Chef DK
-VERSION='2.3.5'
-PACKAGE="chefdk_${VERSION}-1_amd64.deb"
-curl -O  https://packages.chef.io/files/stable/chefdk/${VERSION}/ubuntu/16.04/${PACKAGE}
+PKGVER='2.5.3'
+PKGNAME="chefdk_${VERSION}-1_amd64.deb"
+# grok proper distro version for Ubuntu or Zorin
+declare -A VERS; VERS+=( ["trusty"]="14.04" ["xenial"]="16.04" )
+VER=${VERS[$(lsb_release -c -s)]}
+
+curl -O  https://packages.chef.io/files/stable/chefdk/${PKGVER}/ubuntu/${VER}/${PKGNAME}
 sudo dpkg -i ${PACKAGE}
 ```
+
+If you use Knife-Zero, you can install it into Chef's embedded ruby environment:
+
+```bash
+chef exec gem install knife-zero
+```
+
 
 ### **AWS Tools**
 
@@ -650,7 +663,7 @@ aws_secret_access_key = REDACTED
 
 ### **HashiCorp Tools: Howbow Dah**
 
-**Updated:** 2018年4月12日
+* **Updated:** 2018年4月12日
 
 ```bash
 # Consul
