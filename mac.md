@@ -30,18 +30,22 @@ brew cask install cakebrew
 
 ## **Profiles: Oh Gawd, why, why**
 
-Mac OS X is confusing as it doesn't follow normal pattern in regards to `.bashrc` and `.bash_profile`.  More information, see: http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html
+* **Updated:** 2018年5月7日
+
+Mac OS X is confusing as it doesn't follow normal pattern in regards to `.bashrc` and `.bash_profile`.  More information, see: http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html.  Generally, use `~/.bash_profile` on Mac OS X (or macOS) as `Terminal.app` uses this (does login envents each time).  One workaround is to can put everything in `~/.bashrc` just like in Linux, and then have `~/.bash_profile` source the `/.bashrc`.  This guide will instruct you to use `~/.bash_profile` as this is what is expected on Mac OS X (macOS), so you'll have to make adjustments accodringly if you want to use this workaround.
+
+**IMPORTANT**: For `zsh` users, use `~/.zshenv` anywhere you see `~/.bash_profile` used in this guide.
 
 This is what I do:
 
 ```bash
-# Setup Environment
+# Setup Environment (login script for Terminal.app)
 cat <<-BASHPROFILE_EOF > ${HOME}/.bash_profile
 [[ -r ~/.profile ]] && . ~/.profile  # personally use for cross shell functions
 [[ -r ~/.bashrc ]] && . ~/.bashrc    # personally put configurations here
 BASHPROFILE_EOF
 
-# Add some Mac color enabler function
+# Shared Functions
 cat <<-PROFILE_EOF >> ${HOME}/.profile
 mac_colors() {
   # Prompt Dressing
@@ -62,8 +66,11 @@ source ~/.bashrc
 
 ## **Command Line Tools**
 
+For zsh environment, use `~/.zshenv`, wherever `~/.bash_profile` is mentioned.
 
 ### **Essential GNU Tools**
+
+* **Updated:** 2018年5月7日
 
 The BSD Unix tools suck compared to GNU Sed and GNU Awk.  Use GNU tools like a champ.
 
@@ -82,6 +89,7 @@ brew 'findutils', args: ['with-default-names']
 brew 'gnutls'
 brew 'bash'                                     # Bash v4 (Bash v3 = old)
 brew 'bash-completion'
+brew 'zsh'
 brew 'gzip'
 brew 'screen'
 brew 'watch'
@@ -118,6 +126,7 @@ brew 'dnsmasq'          # local cache dns server
 brew 'nmap'             # port scanner
 brew 'dockviz'
 brew 'pstree'           # process tree
+brew 'ag'               # silversearcher
 BREWFILE_EOF
 brew bundle --verbose
 cp /usr/local/opt/dnsmasq/dnsmasq.conf.example /usr/local/etc/dnsmasq.conf
@@ -135,7 +144,7 @@ Assuming you do not already have SSH keys generated.  ***NOTE***: If you need to
 ```bash
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 eval "$(ssh-agent -s)"
-ssh-add -K ~/.ssh/id_rsa
+ssh-add -K ~/.ssh/id_rsa # Mac only -K for KeyChain
 ```
 
 Full Instructions:
@@ -177,7 +186,7 @@ BREWFILE_EOF
 brew bundle --verbose
 # create default docker-machine
 docker-machine create default --driver virtualbox
-# download vagrant boxes
+# example download vagrant boxes
 vagrant box add ubuntu/trusty64
 ```
 
@@ -465,7 +474,49 @@ cpanm HTTP::Tiny
 cpanm Log::Log4perl
 ```
 
-### **Python 2 Environment**
+### **Python**
+
+Homebrew has has some breaking chanages on at least two ocassions in the last three years, so from this experience, recommend using a python manager like `pyenv`.  This may have something to do with the community at large, where some environments have `python` pointing to either `python2` or `python3`.  For this reason, I would also recommend not relying on `python` as the executable in the shebang line, and refer to the `python2` or `python3` explicitly, adding symblinks if required:
+
+  * `!#/usr/bin/env python3`
+  * `!#/usr/bin/env python2`
+
+### **Python with pyenv**
+
+* **Updated:** 2018年5月7日
+
+```bash
+brew install pyenv
+##### Install Python2 and Python3 pythons
+# https://github.com/pyenv/pyenv
+pyenv install 2.7.15
+pyenv install 3.6.2
+##### Initialize Environment
+$ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+eval "$(pyenv init -)"
+##### Set python3 and python3 (first is default python)
+pyenv global 3.6.2 2.7.15 # use both versions
+##### Update Both Envirnoments
+pip2 install --upgrade pip setuptools
+pip3 install --upgrade pip setuptools
+pip3 install yq     # https://yq.readthedocs.io/en/latest/
+pip3 install fabric # http://www.fabfile.org/
+##### VirtualEnv 
+# https://github.com/pyenv/pyenv-virtualenv
+brew install pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
+eval "$(pyenv virtualenv-init -)"
+pyenv virtualenv 2.7.15 'my-virtual-env-2.7.15'
+pyenv virtualenv 3.6.2 'my-virtual-env-3.6.2'
+pyenv activate 'my-virtual-env-2.7.15'
+pip install configparser xmltodict PyYAML
+pyenv deactivate
+pyenv activate 'my-virtual-env-3.6.2'
+pip install configparser xmltodict PyYAML
+pyenv deactivate
+```
+
+#### **Python 2 using Homebrew**
 
 * **Updated:** 2018年5月7日
 
@@ -479,14 +530,14 @@ pip2 install --upgrade pip setuptools
 # VirtualEnv setup
 pip2 install virtualenv virtualenvwrapper
 mkdir ${HOME}/.virtualenvs
-VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
+VIRTUALENVWRAPPER_PYTHON=$(which python2)
 source /usr/local/bin/virtualenvwrapper.sh
 # Install Some Libraries
-sudo -H pip2 install configparser xmltodict PyYAML
+sudo -H pip2 install configparser xmltodict PyYAML yq fabric
 sudo -H chown -R ${USER}:admin "$(pip2 --version | awk '{print $4}')" # fix permission
 ```
 
-### **Python 3 Environment**
+### **Python 3 using Homebrew**
 
 * **Updated:** 2018年5月7日
 
@@ -495,21 +546,10 @@ brew install python3
 pip3 install --upgrade pip setuptools wheel
 pip3 install virtualenv virtualenvwrapper
 mkdir ${HOME}/.virtualenvs
-VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+VIRTUALENVWRAPPER_PYTHON=$(which python3)
 source /usr/local/bin/virtualenvwrapper.sh
-sudo -H pip3 install configparser xmltodict PyYAML
+sudo -H pip3 install configparser xmltodict PyYAML yq fabric
 sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')" # fix permission
-```
-
-### **Python with PyEnv**
-
-* **Updated:** 2018年5月7日
-
-```bash
-brew install pyenv
-pyenv install 2.7.15
-pyenv install 3.6.2
-pyenv local 3.6.2 2.7.15
 ```
 
 ### **NodeJS using NVM**
