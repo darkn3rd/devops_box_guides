@@ -313,6 +313,12 @@ Installing modules is done from the GUI within the application.
 
 ### **Java Platform**
 
+* **Updated:** 2018年5月7日
+
+Homebrew Cask will install the latest stable version of Java, so if you need an earlier version, you have to explicitly install it.  
+
+Below is an example of installing Java 8 (`jdk1.8.0`) and Java 10 (`jdk-10.0.1`).
+
 ```bash
 cat <<-BREWFILE_EOF > Brewfile
 # Java Platform Tools
@@ -325,14 +331,17 @@ brew 'rhino'  # javascript cli using java
 BREWFILE_EOF
 brew bundle --verbose
 
-cat <<-PROFILE_EOF >> ${HOME}/.profile
+# Install JDK 1.8 (Java8)
+brew install "caskroom/versions/java8"
+
+cat <<-'PROFILE_EOF' >> ${HOME}/.profile
 env_groovy() {
   export GROOVY_HOME=/usr/local/opt/groovy/libexec
 }
 
-# Prereq: Maven should be installed `brew install maven` (2016-01)
+# Prereq: Maven should be installed 'brew install maven' (2016-01)
 env_maven() {
-  export M2_HOME=/usr/local/Cellar/maven/3.3.9
+  export M2_HOME=/usr/local/Cellar/maven/$(ls /usr/local/Cellar/maven | sort | head -1)
   export MAVEN_OPTS="-Xms256m -Xmx512m"
   export M2=$M2_HOME/bin
   export PATH=$M2:$PATH
@@ -357,7 +366,7 @@ removeFromPath() {
 PROFILE_EOF
 
 cat <<-BASHRC_EOF >> ${HOME}/.bashrc
-setjdk 8
+setjdk 1.8 # or setjdk 10
 env_groovy
 env_maven
 BASHRC_EOF
@@ -456,18 +465,12 @@ cpanm HTTP::Tiny
 cpanm Log::Log4perl
 ```
 
-
 ### **Python 2 Environment**
 
-Homebrew has changed the behavior of Python 2 installation. The command `python` no longer points to `/usr/local/bin/python`.  You'll have add `/usr/local/opt/python/libexec/bin`, to have access both `python` `pip` from Homebrew's Python2 installation, otherwise, it uses the operating system's older version of Python2.
-
-You can always explicitly access Python2 environment as `pip2` and `python2`.  Python 2 packages installed with pip are stored in: `/usr/local/lib/python2.7/site-packages`.
-
-Also, the `brew link` is in process of being deprecated, something to do with Apple Spotlight _bugs_ or _features_.
+* **Updated:** 2018年5月7日
 
 ```bash
-brew install python
-export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+brew install python2
 
 # Deprecated: `brew linkapps 'python'``
 # Update SetupTools (easy_install) and PIP
@@ -485,7 +488,7 @@ sudo -H chown -R ${USER}:admin "$(pip2 --version | awk '{print $4}')" # fix perm
 
 ### **Python 3 Environment**
 
-Python 3 environment is explicitly accessed using `pytyon3` and for packages `pip3`.  The python 3 packages are stored in: `/usr/local/lib/python3.6/site-packages`
+* **Updated:** 2018年5月7日
 
 ```bash
 brew install python3
@@ -498,11 +501,24 @@ sudo -H pip3 install configparser xmltodict PyYAML
 sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')" # fix permission
 ```
 
+### **Python with PyEnv**
+
+* **Updated:** 2018年5月7日
+
+```bash
+brew install pyenv
+pyenv install 2.7.15
+pyenv install 3.6.2
+pyenv local 3.6.2 2.7.15
+```
+
 ### **NodeJS using NVM**
+
+* **Updated:** 2018年5月7日
 
 ```bash
 # From http://nvm.sh
-NVM_VERSION='v0.33.1' # Annoying, VERSION keeps shifting, think they'd make latest
+NVM_VERSION='v0.33.11' # Annoying, VERSION keeps shifting, think they'd make latest
 NVM_INSTALL_SCRIPT="https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh"
 curl -o- ${NVM_INSTALL_SCRIPT} | bash
 
@@ -516,14 +532,14 @@ command -v nvm &> /dev/null && nvm install 6    # specific version
 Setup environment support for NVM
 
 ```bash
-cat <<-PROFILE_EOF >> ${HOME}/.profile
+cat <<-'PROFILE_EOF' >> ${HOME}/.profile
 nvm_environment() {
   export NVM_DIR="${HOME}/.nvm"
   [ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh"  # This loads nvm
 }
 PROFILE_EOF
 
-cat <<-BASHRC_EOF >> ${HOME}/.bashrc
+cat <<-'BASHRC_EOF' >> ${HOME}/.bashrc
 nvm_environment  # boostrap nvm environment
 nvm use 6        # chose version 6.x
 BASHRC_EOF
@@ -533,7 +549,7 @@ Afterward, install Node modules:
 
 ```bash
 npm -g install grunt mocha bower
-npm -g install typescript coffee-script
+npm -g install typescript coffeescript
 ```
 
 ### **Ruby**
@@ -816,7 +832,7 @@ account = taldarim@gmail.com
 project = protoss-stalker-568143
 CONFIG_EOF
 gcloud config configurations activate ${ACCOUNT}
-gcloud auth login 
+gcloud auth login
 ```
 
 ### **AWS Tools**
