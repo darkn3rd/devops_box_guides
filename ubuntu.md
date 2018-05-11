@@ -37,11 +37,11 @@ Developers need to test in Linux, as production systems are not on Macbooks.
 ```bash
 # Install Virtualbox for Vagrant
 VBOX_DEB_KEY="https://www.virtualbox.org/download/oracle_vbox_2016.asc"
-VBOX_DEB_SRC='deb http://download.virtualbox.org/virtualbox/debian xenial contrib'
+VBOX_DEB_SRC='deb http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib'
 wget -q ${VBOX_DEB_KEY}-O- | sudo apt-key add -
-sudo echo ${VBOX_DEB_SRC} >> /etc/apt/sources.list
+sudo echo ${VBOX_DEB_SRC} > /etc/apt/sources.list.d/virtualbox.list
 sudo apt update
-sudo apt install -y virtualbox-5.1
+sudo apt install -y virtualbox-5.2
 ```
 
 ### **Virtualization with QEMU/KVM**
@@ -57,9 +57,9 @@ sudo virsh -c qemu:///system list
 Download and Install Vagrant:
 
 ```bash
-VERSION='1.9.5'
+VERSION='2.0.3'
 PACKAGE="vagrant_${VERSION}_x86_64.deb"
-curl -O https://releases.hashicorp.com/vagrant/1.9.5/${PACKAGE}
+curl -O https://releases.hashicorp.com/vagrant/${VERSION}/${PACKAGE}
 sudo dpkg -i ${PACKAGE}
 ```
 
@@ -387,13 +387,19 @@ sudo apt install -y cpanminus
 cpanm --local-lib=~/perl5 local::lib
 eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
+# Install Core Perl Utilities that were removed in Perl v5.22
+cpanm App::s2p App::a2p App::find2perl
 # Install Perl Modules
 cpanm YAML::XS
 cpanm HTTP::Tiny
 cpanm Log::Log4perl
 ```
 
-### **Python 2 Environment**
+### **Python**
+
+* **Updated:** 2018年5月10日
+
+#### **Python 2 Environment (System Python)**
 
 Ubuntu 16.04 comes with aversion of Python (python 2.7.12 as of June 2017). Unfortunately, the package manager `pip` is not installed.
 
@@ -401,7 +407,7 @@ Python 2.7.12 is already installed with the system.
 
 ```bash
 # Install PIP Package Manager
-sudo apt install -y  python-pip
+sudo apt install -y python-pip
 # Upgrade SetupTools (easy_install) and PIP
 sudo -H pip install --upgrade pip setuptools
 # VirtualEnv setup
@@ -411,6 +417,68 @@ source /usr/local/bin/virtualenvwrapper.sh
 # Install Some Libraries
 sudo -H pip install configparser xmltodict PyYAML
 ```
+
+#### **Python with PyEnv**
+
+The system pythons will not always be up to date with current packages.  You can use `pyenv` to manage both `python2` and `python3` environments.
+
+```bash
+# Build tools required for python
+sudo apt-get install -y \
+  make \
+  build-essential \
+  libssl-dev \
+  zlib1g-dev \
+  libbz2-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  wget \
+  curl \
+  llvm \
+  libncurses5-dev \
+  libncursesw5-dev \
+  xz-utils \
+  tk-dev
+
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~./bashrc
+```
+
+After you can install pythons and packages:
+
+```bash
+##### Install Python2 and Python3 pythons
+# https://github.com/pyenv/pyenv
+pyenv install 2.7.15
+pyenv install 3.6.2
+##### Initialize Environment
+$ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+eval "$(pyenv init -)"
+##### Set python3 and python3 (first is default python)
+pyenv global 3.6.2 2.7.15 # use both versions
+##### Update Both Envirnoments
+pip2 install --upgrade pip setuptools
+pip3 install --upgrade pip setuptools
+pip3 install yq     # https://yq.readthedocs.io/en/latest/
+pip3 install fabric # http://www.fabfile.org/
+##### VirtualEnv
+# https://github.com/pyenv/pyenv-virtualenv
+brew install pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
+eval "$(pyenv virtualenv-init -)"
+pyenv virtualenv 2.7.15 'my-virtual-env-2.7.15'
+pyenv virtualenv 3.6.2 'my-virtual-env-3.6.2'
+pyenv activate 'my-virtual-env-2.7.15'
+pip install configparser xmltodict PyYAML
+pyenv deactivate
+pyenv activate 'my-virtual-env-3.6.2'
+pip install configparser xmltodict PyYAML
+pyenv deactivate
+```
+
+
 
 ### **NodeJS using NVM**
 
