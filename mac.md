@@ -712,6 +712,7 @@ After crafting some tests, you can run them using `rake spec` command, or manual
 
 ### **InSpec**
 
+
 [InSpec](https://www.inspec.io/) is a framework to create infrastructure tests for integration or compliance testing and is marketed as *compliance as code*.  The tests are organized in a test profile, which can be initially created with `inspec init profile NAME`.  
 
 Inspec uses similar syntax to ServerSpec, but is not feature parity with ServerSpec.  Execution of test scripts is done manually using `inspec` command.  There is no further automation to orchestrate tests directly [Vagrant](https://www.vagrantup.com/) or [Docker](https://www.docker.com/), so this will have to be created manually.  There is integration through [TestKitchen](http://kitchen.ci/) tool.
@@ -783,9 +784,13 @@ brew cask install --appdir='/Applications' puppet-agent
 
 #### **ChefDK**
 
+* **Updated:** 2018年6月7日 Homebrew deprecated ChefDK out of their system.
+
+
 ```bash
 # Chef DK
-brew cask install --appdir='/Applications' chefdk
+brew tap chef/chef
+brew cask install chefdk
 ```
 
 If you use default ruby or really do not care about ruby versions and conflicts, you can use these helper scripts in your environment to setup ChefDK.  The `  eval "$(chef shell-init bash)"` is not compatible with RBenv or RVM.
@@ -807,12 +812,15 @@ BASHRC_EOF
 
 ##### **ChefDK with RBEnv**
 
+* **Updated:** 2018年6月7日 fixes
+
+
 If you use RBEnv, you can use [rbenv-chefdk](https://github.com/docwhat/rbenv-chefdk), as per instructions:
 
 ```bash
 brew install rbenv-chefdk
-mkdir "$(rbenv root)/versions/ext-chefdk-ruby"
-rbenv shell ext-chefdk-ruby
+mkdir "$(rbenv root)/versions/chefdk"
+rbenv shell chefdk
 rbenv rehash
 ```
 
