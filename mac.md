@@ -202,10 +202,19 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 brew install macvim --env-std --with-override-system-vim
 ```
 
-### **Sublime**
+### **Sublime Text 3**
+
+* **Updated:** 2018年7月9日
+
+Sublime can be installed and accessed by the command line.  
+
+Unfortunately, there's no command line package manager capability, so this will have to be done in the GUI.
 
 ```bash
+# Sublime Text 3
 brew cask install sublime-text
+# Command Line Support
+ln -sf "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
 ```
 
 ### **Atom**
@@ -501,7 +510,7 @@ pip2 install --upgrade pip setuptools
 pip3 install --upgrade pip setuptools
 pip3 install yq     # https://yq.readthedocs.io/en/latest/
 pip3 install fabric # http://www.fabfile.org/
-##### VirtualEnv 
+##### VirtualEnv
 # https://github.com/pyenv/pyenv-virtualenv
 brew install pyenv-virtualenv
 echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
