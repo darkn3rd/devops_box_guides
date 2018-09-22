@@ -772,6 +772,9 @@ inspec exec $PROFILENAME/ \
 
 ### **Change Configuration Tools**
 
+* **Updated:** 2018年9月22日
+
+
 Alright, I am not endorsing any particular tool, install the ones you like.
 
 ```bash
@@ -786,7 +789,10 @@ sudo -H chown -R ${USER}:admin "$(pip --version | awk '{print $4}')"
 # CFEngine
 brew install cfengine
 
-# Puppet
+# Puppet 5.x
+brew tap puppetlabs/puppet
+brew cask install pdk
+brew cask install puppet-bolt
 brew cask install --appdir='/Applications' puppet-agent
 ```
 
@@ -1004,6 +1010,21 @@ Play with orchestration tools on Mac OS X with [MiniMesos](https://minimesos.org
 brew cask install minikube
 brew install minimesos
 ```
+
+## **GitOps**
+
+### **Jenkins/X Client**
+
+* **Added:** 2018年9月22日
+
+```bash
+cat <<-BREWFILE_EOF > Brewfile
+tap  'jenkins-x/jx'
+brew 'jx'
+BREWFILE_EOF
+brew bundle --verbose
+```
+
 
 ## **Applications**
 

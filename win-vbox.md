@@ -632,6 +632,16 @@ PACKER_PATH="/c/ProgramData/chocolatey/lib/packer/tools/packer.exe"
 ln -s ${PACKER_PATH} /usr/bin/packer.exe
 ```
 
+## **GitOps**
+
+### **Jenkins/X Client**
+
+* **Added:** 2018年9月22日
+
+```PowerShell
+choco install jenkins-x
+```
+
 ## **Applications**
 Some open source applications that you may want, edit as desired.
 

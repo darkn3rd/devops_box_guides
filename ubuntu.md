@@ -841,6 +841,19 @@ cp VagrantConfig-1m-1a-1p.yaml VagrantConfig.yaml
 vagrant up
 ```
 
+## **GitOps**
+
+### **Jenkins/X Client**
+
+* **Added:** 2018年9月22日
+
+```bash
+mkdir -p ~/.jx/bin
+curl -L https://github.com/jenkins-x/jx/releases/download/v1.3.302/jx-linux-amd64.tar.gz | tar xzv -C ~/.jx/bin
+export PATH=$PATH:~/.jx/bin
+echo 'export PATH=$PATH:~/.jx/bin' >> ~/.bashrc
+```
+
 ## **Applications**
 
 Some open source applications that you may want, edit as desired.
