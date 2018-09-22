@@ -1,0 +1,13 @@
+# virtual system platform (requires kext)
+cask 'virtualbox'
+cask 'virtualbox-extension-pack'
+# virtual system orchestrator
+cask 'vagrant'
+# test-kitchen test harness, inspec test tool
+tap 'chef/chef'
+cask 'chefdk'
+# docker engine + docker system
+cask 'docker-toolbox'
+# kubernetes client + kubernetes cluster
+cask 'minikube'
+brew 'kubectl'
