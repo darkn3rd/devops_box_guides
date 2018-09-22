@@ -16,9 +16,9 @@ For now only targeting:
 * Mac OS X:
   * Mac OS 10.12 Sierra with Homebrew
 * Windows 10
-   * Windows 10 with Virtualbox
+   * Windows 7, 8.1, 10 with Virtualbox + MYS2
 * Linux:
-   * Ubuntu 16 Xenial Xerus
+   * Ubuntu 16.04 Xenial Xerus
 
 
 ## **Notes**
@@ -29,7 +29,7 @@ At some point in the future, interested in documenting:
 
 * **Linux**
   * Distros: CentOS, Debian, Fedora, Arch
-  * Virtualization: KVM, Xen
+  * Virtualization: libvrt
 * **Windows**
   * Versions: Windows 7, Windows 8.1, Windows 2012, Windows 2016
   * Virtualization: Hyper/V path
