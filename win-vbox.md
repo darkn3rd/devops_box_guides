@@ -464,12 +464,20 @@ pip install configparser xmltodict PyYaml
 
 ### **Node**
 
+* **Update:** 2018年9月29日
+
+You can install Node directly, but recommending using nvm instead.
+
 ```PowerShell
-choco install -y nodejs-lts
+# Tools 
+choco install cmder # optional console w/ git + msvc
+choco install nvm
 # Refresh PATH
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") `
-   + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-# Install Modules
+refreshenv
+# Install Node
+nvm install 8.12.0
+nvm use 8.12.0
+# Example of Installing Modules
 npm -g install grunt mocha bower
 npm -g install typescript coffee-script
 ```

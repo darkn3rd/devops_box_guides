@@ -563,19 +563,21 @@ sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')" # fix perm
 
 ### **NodeJS using NVM**
 
-* **Updated:** 2018年5月7日
+* **Updated:** 
+  * 2018年5月7日  - nvm download 
+  * 2018年9月29日 - update using brew to install nvm
+
 
 ```bash
-# From http://nvm.sh
-NVM_VERSION='v0.33.11' # Annoying, VERSION keeps shifting, think they'd make latest
-NVM_INSTALL_SCRIPT="https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh"
-curl -o- ${NVM_INSTALL_SCRIPT} | bash
-
-export NVM_DIR="${HOME}/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-
-command -v nvm &> /dev/null && nvm install node # latest
-command -v nvm &> /dev/null && nvm install 6    # specific version
+brew install nvm
+# Source nvm script library
+source $(brew --prefix nvm)/nvm.sh
+# Install Node
+nvm install 8.12.0
+nvm use 8.12.0
+# Example of Installing Modules
+npm -g install grunt mocha bower
+npm -g install typescript coffee-script
 ```
 
 Setup environment support for NVM
@@ -583,14 +585,13 @@ Setup environment support for NVM
 ```bash
 cat <<-'PROFILE_EOF' >> ${HOME}/.profile
 nvm_environment() {
-  export NVM_DIR="${HOME}/.nvm"
-  [ -s "${NVM_DIR}/nvm.sh" ] && . "${NVM_DIR}/nvm.sh"  # This loads nvm
+  source $(brew --prefix nvm)/nvm.sh
 }
 PROFILE_EOF
 
 cat <<-'BASHRC_EOF' >> ${HOME}/.bashrc
-nvm_environment  # boostrap nvm environment
-nvm use 6        # chose version 6.x
+nvm_environment
+nvm use 8.12.0
 BASHRC_EOF
 ```
 
