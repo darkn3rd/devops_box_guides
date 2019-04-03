@@ -30,7 +30,7 @@ brew cask install cakebrew
 
 ## **Profiles: Oh Gawd, why, why**
 
-* **Updated:** 2018年5月7日
+* **Updated:** 2019年4月3日
 
 Mac OS X is confusing as it doesn't follow normal pattern in regards to `.bashrc` and `.bash_profile`.  More information, see: http://www.joshstaiger.org/archives/2005/07/bash_profile_vs.html.  Generally, use `~/.bash_profile` on Mac OS X (or macOS) as `Terminal.app` uses this (does login envents each time).  One workaround is to can put everything in `~/.bashrc` just like in Linux, and then have `~/.bash_profile` source the `/.bashrc`.  This guide will instruct you to use `~/.bash_profile` as this is what is expected on Mac OS X (macOS), so you'll have to make adjustments accodringly if you want to use this workaround.
 
@@ -51,8 +51,6 @@ mac_colors() {
   # Prompt Dressing
   export CLICOLOR=1
   export LSCOLORS=GxFxCxDxBxegedabagaced
-  export TERM="xterm-color"
-  export PS1='\[\e[0;33m\]\u\[\e[0m\]@\[\e[0;32m\]\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0m\]$ '
 }
 PROFILE_EOF
 
@@ -64,9 +62,50 @@ BASHRC_EOF
 source ~/.bashrc
 ```
 
+## **Path Munging**
+
+Apple macOS (aka Mac OS X) fetches the path from `/etc/paths` and files within `/etc/paths.d`.  To access these paths in a clean way, Apple adds this to initial shell bootstrap files (`/etc/zprofile` and `/etc/profile`):
+
+```shell
+if [ -x /usr/libexec/path_helper ]; then
+	eval `/usr/libexec/path_helper -s`
+fi
+```
+
+If for some reason this is not available, you can add these to your environment.
+
+As a general method to add an item, if it is not already exists in the path, you can use this snippet.
+
+
+For bash:
+
+```shell
+function add_to_path() {
+  for path in ${2//:/ }; do
+    if ! [[ "${!1}" =~ "${path%/}" ]]; then # ignore last /
+      new_path="$path:${!1#:}"
+      export "$1"="${new_path%:}" # remove trailing :
+    fi
+  done
+}
+```
+
+For zsh:
+
+```shell
+function add_to_path() {
+  for p in ${(s.:.)2}; do
+    if [[ ! "${(P)1}" =~ "${p%/}" ]]; then
+      new_path="$p:${(P)1#:}"
+      export "$1"="${new_path%:}"
+    fi
+  done
+}
+```
+
 ## **Command Line Tools**
 
-For zsh environment, use `~/.zshenv`, wherever `~/.bash_profile` is mentioned.
+For zsh environment, use `~/.zshenv`, wherever `~/.bash_profile` is mentioned, and use `~/.zshrc` wherever `/.bashrc` is mentioned.
 
 ### **Essential GNU Tools**
 
@@ -87,7 +126,7 @@ brew 'gnu-which', args: ['with-default-names']  # GNU Which
 brew 'gawk'                                     # GNU Awk (BSD Awk sucks)
 brew 'findutils', args: ['with-default-names']
 brew 'gnutls'
-brew 'bash'                                     # Bash v4 (Bash v3 = old)
+brew 'bash'                                     # Bash v5 (Bash v3 = old)
 brew 'bash-completion'
 brew 'zsh'
 brew 'gzip'
@@ -100,6 +139,8 @@ brew bundle --verbose
 ```
 
 ### **Some Other Tools**
+
+* **Updated:** 2019年4月3日
 
 Edit as desired:
 
@@ -126,7 +167,7 @@ brew 'dnsmasq'          # local cache dns server
 brew 'nmap'             # port scanner
 brew 'dockviz'
 brew 'pstree'           # process tree
-brew 'ag'               # silversearcher
+brew 'the_silver_searcher'
 BREWFILE_EOF
 brew bundle --verbose
 cp /usr/local/opt/dnsmasq/dnsmasq.conf.example /usr/local/etc/dnsmasq.conf
@@ -485,7 +526,7 @@ cpanm Log::Log4perl
 
 ### **Python**
 
-Homebrew has has some breaking chanages on at least two ocassions in the last three years, so from this experience, recommend using a python manager like `pyenv`.  This may have something to do with the community at large, where some environments have `python` pointing to either `python2` or `python3`.  For this reason, I would also recommend not relying on `python` as the executable in the shebang line, and refer to the `python2` or `python3` explicitly, adding symblinks if required:
+Homebrew has had some breaking changes on at least two occasions in the last three years, so from this experience, recommend using a python manager like `pyenv`.  This may have something to do with the community at large, where some environments have `python` pointing to either `python2` or `python3`.  For this reason, I would also recommend not relying on `python` as the executable in the shebang line, and refer to the `python2` or `python3` explicitly, adding symlinks if required:
 
   * `!#/usr/bin/env python3`
   * `!#/usr/bin/env python2`
@@ -504,7 +545,7 @@ pyenv install 3.6.2
 $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
 eval "$(pyenv init -)"
 ##### Set python3 and python3 (first is default python)
-pyenv global 3.6.2 2.7.15 # use both versions
+pyenv global 3.7.2 2.7.15 # use both versions
 ##### Update Both Envirnoments
 pip2 install --upgrade pip setuptools
 pip3 install --upgrade pip setuptools
@@ -516,11 +557,11 @@ brew install pyenv-virtualenv
 echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
 eval "$(pyenv virtualenv-init -)"
 pyenv virtualenv 2.7.15 'my-virtual-env-2.7.15'
-pyenv virtualenv 3.6.2 'my-virtual-env-3.6.2'
+pyenv virtualenv 3.7.2 'my-virtual-env-3.7.2'
 pyenv activate 'my-virtual-env-2.7.15'
 pip install configparser xmltodict PyYAML
 pyenv deactivate
-pyenv activate 'my-virtual-env-3.6.2'
+pyenv activate 'my-virtual-env-3.7.2'
 pip install configparser xmltodict PyYAML
 pyenv deactivate
 ```
@@ -563,8 +604,8 @@ sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')" # fix perm
 
 ### **NodeJS using NVM**
 
-* **Updated:** 
-  * 2018年5月7日  - nvm download 
+* **Updated:**
+  * 2018年5月7日  - nvm download
   * 2018年9月29日 - update using brew to install nvm
 
 
@@ -572,9 +613,9 @@ sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')" # fix perm
 brew install nvm
 # Source nvm script library
 source $(brew --prefix nvm)/nvm.sh
-# Install Node
-nvm install 8.12.0
-nvm use 8.12.0
+# Install Noe
+nvm install 11.13.0
+nvm use 11.13.0
 # Example of Installing Modules
 npm -g install grunt mocha bower
 npm -g install typescript coffee-script
@@ -591,7 +632,7 @@ PROFILE_EOF
 
 cat <<-'BASHRC_EOF' >> ${HOME}/.bashrc
 nvm_environment
-nvm use 8.12.0
+nvm use 11.13.0
 BASHRC_EOF
 ```
 
@@ -669,10 +710,10 @@ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 # get list of ruby versions that can be installed
 rbenv install --list
 # install ruby versions (whatever makes sense for your environment)
-rbenv install 2.4.2
+rbenv install 2.6.2
 rbenv install 2.3.5
 # set desired ruby version
-rbenv global 2.4.2
+rbenv global 2.6.2
 # install bundler for depenedency management
 gem update --system
 gem install bundler
@@ -901,6 +942,9 @@ gcloud auth login
 
 ### **AWS Tools**
 
+
+#### **AWS CLI**
+
 AWS Command Line Tools and [AWS Vault](https://github.com/99designs/aws-vault).  
 
 Updated this to explicitly use `pip3` on Mac OS X.
@@ -908,6 +952,42 @@ Updated this to explicitly use `pip3` on Mac OS X.
 ```bash
 sudo -H pip3 install awscli
 sudo -H chown -R ${USER}:admin "$(pip3 --version | awk '{print $4}')"
+```
+
+#### **AWS CDK (Cloud Dev Kit) for TypeScript, Java, C#**
+
+AWS added [AWS CDK](https://github.com/awslabs/aws-cdk) for TypeScript, Java, and C# languages.  
+
+**Prerequisite**: [NodeJS](#nodejs-using-nvm).
+
+```shell
+npm i -g aws-cdk
+mkdir hello-cdk
+cd hello-cdk
+cdk init app --language=typescript # (or --language=java, ...)
+cdk deploy
+```
+
+#### **AWS SDK for JavaScript**
+
+**Prerequisite**: [NodeJS](#nodejs-using-nvm).
+
+
+```shell
+npm i -g aws-sdk
+```
+
+#### **AWS SDK for Ruby**
+
+**Prerequisite**: [Ruby](#ruby).
+
+```shell
+gem install aws-sdk
+```
+
+#### **AWS Profile Management**
+
+```bash
 mkdir -p ${HOME}/.aws
 # configure environment(s)
 touch ${HOME}/.aws/credentials
