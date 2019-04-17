@@ -961,7 +961,7 @@ AWS added [AWS CDK](https://github.com/awslabs/aws-cdk) for TypeScript, Java, an
 **Prerequisite**: [NodeJS](#nodejs-using-nvm).
 
 ```shell
-npm i -g aws-cdk
+npm i -g 'aws-cdk'
 mkdir hello-cdk
 cd hello-cdk
 cdk init app --language=typescript # (or --language=java, ...)
@@ -974,7 +974,7 @@ cdk deploy
 
 
 ```shell
-npm i -g aws-sdk
+npm i -g 'aws-sdk'
 ```
 
 #### **AWS SDK for Ruby**
@@ -982,7 +982,16 @@ npm i -g aws-sdk
 **Prerequisite**: [Ruby](#ruby).
 
 ```shell
-gem install aws-sdk
+gem install 'aws-sdk'
+```
+
+#### **AWS SDK for Go Language**
+
+**Prerequisite**: [Go Lang](#go-lang).
+
+
+```shell
+go get -u 'github.com/aws/aws-sdk-go'
 ```
 
 #### **AWS Profile Management**
