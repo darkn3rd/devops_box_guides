@@ -626,7 +626,7 @@ puppet_versions
 
 * **Updated:** 2018年4月12日
 
-The [ChefDK](https://downloads.chef.io/chefdk) bundles several tools used with Chef, so that they do not have to be installed invidually.  It comes with its own embedded Ruby.
+The [ChefDK](https://downloads.chef.io/chefdk) bundles several tools used with Chef, so that they do not have to be installed individually.  It comes with its own embedded Ruby.
 
 ```bash
 # Chef DK

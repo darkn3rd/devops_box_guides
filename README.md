@@ -9,7 +9,7 @@ This will have three general conceptual areas for any system:
 * Graphical Tools like Editors, IDEs, and fun stuff (Spotify, Slack)
 
 
-## **Environemnts**
+## **Environments**
 
 For now only targeting:
 
@@ -18,10 +18,16 @@ For now only targeting:
 * Windows 10
    * Windows 7, 8.1, 10 with Virtualbox + MYS2
 * Linux:
-   * Ubuntu 16.04 Xenial Xerus
+   * [Ubuntu 20.04.1 Focal Fossa](ubuntu/README.md)
 
 
-## **Notes**
+## **Deprecated**
+
+These are for earlier distros or operating system releases.
+
+* Linux:
+   * [Ubuntu 16.04 Xenial Xerus](deprecated/ubuntu16.md)
+
 
 ### **Future**
 

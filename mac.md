@@ -1,5 +1,8 @@
 # **Pedantic ADHD Guide to DevOps ToolBox: Mac OS X Version**
 
+by Joaquin Menchaca
+Last Update: April, 2019
+
 This is my guide to getting essential tools for DevOps on Mac OS X.
 
 ## **XCode Command Line Tools**
