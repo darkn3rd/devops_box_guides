@@ -1,7 +1,7 @@
 # **Pedantic ADHD Guide to DevOps ToolBox (Ubuntu Focal)**
 
 by Joaquin Menchaca
-Last Update: 2020年10月15日
+Last Update: 2020年10月31日
 
 This is my guide to getting DevOps oriented tools on [Ubuntu 20.04.1 (Focal Fossa)](https://releases.ubuntu.com/20.04/).  
 
@@ -26,6 +26,11 @@ Codename:	focal
   * [Using SSH](#using-ssh)
   * [Using Git](#using-git)
 * [Essential Tools](#essential-tools)
+* [Shell Environment](#shell-environment)
+  * [Modular Bash](#modular-bash)
+  * [Shell Functions](#shell-functions)
+    * [ZSH Functions](#zsh-functions)
+    * [Bash Functions](#bash-functions)
 * [Virtual Machines](#virtual-machines)
   * [KVM](#kvm)
   * [Virtualbox](#virtualbox)
@@ -38,7 +43,6 @@ Codename:	focal
     * [Docker Machine Bash Completion Scripts](#docker-machine-bash-completion-scripts)
     * [Docker Machine with KVM](#docker-machine-with-kvm)
       * [KVM Machine Driver](#kvm-machine-driver)
-      * [KVM2 Machine Driver](#kvm2-machine-driver)
       * [Test Docker-Machine](#test-docker-machine)
   * [Docker Compose](#docker-compose)
 * [Kubernetes](#kubernetes)
@@ -168,9 +172,7 @@ popd
 
 ## **Shell Environment**
 
-### **Modular Shell Configuration**
-
-## **Modular Bash**
+### **Modular Bash**
 
 This is a modular approach to manage configuration as an alternative putting everything in `~/.bashrc`.  If you don't want to use this, then put these configurations into `.bashrc`
 
@@ -179,7 +181,7 @@ sed -i '/^for .*toolbox.d.*$/d' ~/.bashrc
 printf '\nfor TOOLBOX_SCRIPT in ~/.toolbox.d/*.sh;do . "${TOOLBOX_SCRIPT}";done\n' >> ~/.bashrc
 ```
 
-## **Shell Functions**
+### **Shell Functions**
 
 Here are some functions that can be useful for managing shell environment
 
@@ -404,14 +406,16 @@ done
 
 Currently, neither of the two open source machine drivers `kvm` or MiniKube's `kvm2` work now with `docker-machine`:
 
+* Boot2docker Issues:
+    [1407](https://github.com/boot2docker/boot2docker/issues/1407) - `rtl8139cp` missing kernel configuration
 * KVM Issues:
-  * [77](https://github.com/dhiltgen/docker-machine-kvm/issues/77) (Oc 2020)
+  * [77](https://github.com/dhiltgen/docker-machine-kvm/issues/77) (Oc 2020) - Solution https://github.com/afbjorklund/docker-machine-kvm (thank you @afbjorklund)
   * [76](https://github.com/dhiltgen/docker-machine-kvm/issues/76) (May 2020)
 * KVM2 Issues:
   * [9453](https://github.com/kubernetes/minikube/issues/9453) (Oct 2020)
   * [5831](https://github.com/kubernetes/minikube/issues/5831) (Nov 2019)
 
-In overview of the problems, the `kvm` project is no longer making releases, so users can build binary and patch locally. For `kvm2` is only supported with the embedded docker-machine and the configuration that is sent to it is not documented.  Currently, the default options do not work as `kvm2` creates an invalid configuration.  I will document how to download and install the drivers in hopes that maybe interested community members can help support this, as there's no solution path in the community.
+In overview of the problems, the `kvm` project is no longer making releases, so users can build binary and patch locally. For `kvm2` is only supported with the embedded `docker-machine` and the configuration that is sent to it is not documented.  Currently, the default options do not work as `kvm2` creates an invalid configuration.  You can access the docker environment managed by minikube using `minikube docker-env`.
 
 ##### **KVM Machine Driver**
 
@@ -427,18 +431,6 @@ sudo mv docker-machine-driver-kvm-ubuntu16.04 /usr/local/bin/docker-machine-driv
 printf "export export MACHINE_DRIVER=kvm\n" > ~/.toolbox.d/docker-machine.sh
 ```
 
-##### **KVM2 Machine Driver**
-
-```bash
-ASSET=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.assets[].name' | grep kvm2.*deb)
-VERSION=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r '.tag_name')
-curl -sOL https://github.com/kubernetes/minikube/releases/download/$VERSION/$ASSET
-
-sudo apt install ./$ASSET
-
-## configure shell environment for kvm
-printf "export export MACHINE_DRIVER=kvm2\n" > ~/.toolbox.d/docker-machine.sh
-```
 
 ##### **Test Docker Machine**
 
@@ -1102,15 +1094,20 @@ pip install salt
 
 #### **CFEngine 3**
 
-**NOTE**: CFEngine 3.12 requires uses the deprecated Python 2 and requires `python` to run Python 2.
+You can fetch and install CFEngine 3.16 with:
 
 ```bash
-# CFEngine
-sudo apt install -y cfengine3
-## This installs the following system packages
-## cfengine3
-## libpromises3
-## python-is-python2
+wget -O- http://cfengine.package-repos.s3.amazonaws.com/quickinstall/quick-install-cfengine-community.sh | sudo bash
+```
+
+For a more formal installation, you can run this instead:
+
+```bash
+curl -fsSL https://cfengine-repotest.s3.amazonaws.com/pub/gpg.key | sudo apt-key add -
+sudo add-apt-repository \
+ "deb https://cfengine-package-repos.s3.amazonaws.com/pub/apt/packages \
+ stable \
+ main"
 ```
 
 #### **Puppet**
