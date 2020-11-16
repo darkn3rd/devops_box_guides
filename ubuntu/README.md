@@ -711,8 +711,12 @@ PYENV
 Now you can install a desired version of Python.
 
 ```bash
+## Fetch Latest pyenv for updated version list
+## Only Needed if earlier version of pyenv is used
+cd ~/.pyenv/plugins/python-build/../.. && git pull && cd -
+
 LATEST_PYTHON3=$(
- pyenv install --list | tr -d ' ' | grep -P '^3\.*\d+\.\d+' | sort -V | tail -1
+ pyenv install --list | tr -d ' ' | grep -oP '^3\.*\d+\.\d+' | sort -V | tail -1
 )
 
 ## install and set desired ruby version (~8 minutes)
@@ -852,15 +856,7 @@ Currently GCloud SDK is not compatible with latest stable version of Python with
 In order you use `gcloud` command, you need to use a version earlier than Python 3.9.  With `pyenv` installed, you can run:
 
 ```bash
-PYTHON_VERSION=$(pyenv install --lis#### **Ansible**
-
-Create virtualenv for ansible (optional):
-
-```bash
-PYTHON_VERSION="3.9.0"
-pyenv virtualenv $PYTHON_VERSION ansible-$PYTHON_VERSION
-pyenv shell ansible-$PYTHON_VERSION
-```t | tr -d ' ' | grep -P '^3\.7\.\d+'| tail -1)
+PYTHON_VERSION=$(pyenv install --list | tr -d ' ' | grep -P '^3\.7\.\d+'| tail -1)
 pyenv install $PYTHON_VERSION
 ```
 
