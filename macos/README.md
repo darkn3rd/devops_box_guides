@@ -370,26 +370,20 @@ Links:
 
 ### **VirtualBox**
 
+Virtualbox will require a kernel extension to work, which will be blocked from installation unless enabled:
+  System Preferences → Security & Privacy → General
+
+More information about this is documented in an Apple Technical Note:
+  https://developer.apple.com/library/content/technotes/tn2459/_index.html
+
 ```bash
-wget -qO - https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo apt-key add -
-sudo add-apt-repository \
- "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian \
- $(lsb_release -s -c) \
- contrib"
-sudo apt-get update
-sudo apt-get install virtualbox-6.1
+brew install virtualbox
 ```
 
 ## **Vagrant**
 
 ```bash
-LATEST_VAGRANT=$(curl -s https://github.com/hashicorp/vagrant/releases.atom | xml2 | \
-   grep -oP '(?<=feed/entry/title=).*' | sort -V | tail -1
-)
-pushd ~/Downloads
-curl -sOL https://releases.hashicorp.com/vagrant/${LATEST_VAGRANT##v}/vagrant_${LATEST_VAGRANT##v}_x86_64.deb
-sudo apt install ./vagrant_${LATEST_VAGRANT##v}_x86_64.deb
-popd
+brew install vagrant
 ```
 
 ### **Vagrant Virtualbox**
@@ -400,99 +394,44 @@ This is the default provider, so nothing needs to be configured.  You can explic
 printf "export VAGRANT_DEFAULT_PROVIDER=virtualbox\n" > ~/.toolbox.d/vagrant.sh
 ```
 
-### **Vagrant Libvirt**
-
-You can use vagrant with libvirt using [vagrant-libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) plugin.
-
-```bash
-## Enable 'deb-src' URIs for build-dep
-sudo cp /etc/apt/sources.list /etc/apt/sources.list~
-sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
-sudo apt-get update
-
-## Instructions from vagrant-libvirt
-sudo apt-get build-dep vagrant ruby-libvirt
-sudo apt-get install qemu ebtables dnsmasq-base
-sudo apt-get install libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev
-
-## Instsall Plugin for current user
-vagrant plugin install vagrant-libvirt
-
-## Default to Libvirt
-export VAGRANT_DEFAULT_PROVIDER=libvirt
-
-## configure shell environment
-printf "export VAGRANT_DEFAULT_PROVIDER=libvirt\n" > ~/.toolbox.d/vagrant.sh
-```
-
-After this, I actually had to restart before I would have restart before I can create virtual machines that use libvirt (KVM).
-
-#### **Test libvirt provider**
-
-```bash
-mkdir test && cd test
-vagrant init fedora/32-cloud-base
-vagrant up --provider=libvirt
-```
-
-```bash
-## VM Commands
-vagrant status
-virsh list
-
-## Networking Commands
-## ref. https://wiki.libvirt.org/page/Networking
-## ref. https://wiki.libvirt.org/page/VirtualNetworking
-brctl show
-virsh net-list --all
-virsh net-info vagrant-libvirt
-virsh net-dumpxml vagrant-libvirt
-```
 
 ## **Docker**
 
 General docker related technologies.
 
-### **Docker Engine**
+### **Docker Desktop**
 
-Verified: 2020年10月10日
+Verified: 2021年1月7日
 
-```bash
-## Install Prerequisites
-sudo apt-get install -y \
- apt-transport-https \
- ca-certificates \
- gnupg-agent
+This installs the `Docker.app` application, which will further install additional components upon launching:
 
-## Add Repository
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository \
- "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
- $(lsb_release -cs) \
- stable"
-
-## Install Packages
-sudo apt update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-## Allow current user to use docker
-sudo usermod -aG docker $USER
-```
-
-### **Docker Machine**
-
-**Update:** 2020年10月16日
-
-Docker Machine allows you to run Docker in a virtual machine guest instead of on the host.  This is useful for scenarios to test a clean docker environment in a clean environment.
+* [HyperKit](https://github.com/moby/hyperkit) (variant of [xhyve](https://github.com/machyve/xhyve)) and [VPNKit](https://github.com/moby/vpnkit) virtualization solutions
+* Docker CLI (client) - client `docker` command to interact with services
 
 ```bash
-LATEST_MACHINE=$(curl -s https://api.github.com/repos/docker/machine/releases | jq '[.[].tag_name][0]' -r)
-
-## Install binary
-BASE=https://github.com/docker/machine/releases/download/$LATEST_MACHINE
-curl -sL $BASE/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine
-sudo mv /tmp/docker-machine /usr/local/bin/docker-machine &&
-  chmod +x /usr/local/bin/docker-machine
+brew install --cask docker
 ```
+
+Most users will install [Docker Desktop](https://hub.docker.com/editions/community/docker-ce-desktop-mac) as it offers the smoothest experience -- invisibly handling routing through virtual network, so that the docker server is available on `localost`.  The virtual machine environment, HyperKit, is rather limited and oftentimes consumes enormous resources (cpu, memory, battery).
+
+### **Docker Toolbox**
+
+Verified: 2021年1月7日
+
+Docker Toolbox is a collection of tools that includes the following:
+
+* Docker CLI (client) - client `docker` command to interact with services
+* [Docker Machine](https://github.com/docker/machine) - virtual machine manager tool to use virtualization solution of your choice to host the docker server.  Default driver is virtualbox.
+* [Docker Compose](https://docs.docker.com/compose/) - popular tool to manage several Docker containers with intuitive
+* [Kitematic](https://kitematic.com/) - graphical UI application that can visualize and manage docker containers
+
+```bash
+brew install docker-toolbox
+```
+
+[Docker Toolbox](https://docs.docker.com/docker-for-windows/docker-toolbox/) is an easy way to get several Docker tools installed with a single package, but it looks like [Docker Inc.](https://www.docker.com/company) is deprecating this project.  
+
+One of the components, [Docker Machine](https://docs.docker.com/machine/), allows you to use the virtualization solution of your choice, which can include the same [HyperKit](https://github.com/moby/hyperkit) used by [Docker Desktop](https://www.docker.com/products/docker-desktop), [VMWare](https://www.vmware.com/products/fusion.html) or alternatives like [Parallels](https://www.parallels.com/), [Virtualbox](https://www.virtualbox.org/) and cloud solutions.  There is a slight higher learning curve, as the Docker server will be available from an IP address other than `localhost`.
 
 #### **Docker Machine Bash Completion Scripts**
 
@@ -592,22 +531,13 @@ pip install docker-compose
 #### **kubectl**
 
 ```bash
-LATEST_KUBE=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-curl -sOL https://storage.googleapis.com/kubernetes-release/release/$LATEST_KUBE/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-sudo mv ./kubectl /usr/local/bin/kubectl
+brew install kubectl
 ```
-
-**Source**: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
 #### **Helm**
 
 ```bash
-pushd ~/Downloads
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
-popd
+brew install helm
 ```
 **Source**: https://helm.sh/docs/intro/install/
 
@@ -626,10 +556,7 @@ helm plugin install https://github.com/zendesk/helm-secrets
 #### **Helmfile**
 
 ```bash
-LATEST_HELMFILE=$(curl -s https://api.github.com/repos/roboll/helmfile/releases/latest | jq -r '.tag_name')
-curl -sOL https://github.com/roboll/helmfile/releases/download/$LATEST_HELMFILE/helmfile_linux_amd64
-chmod +x helmfile_linux_amd64
-sudo mv helmfile_linux_amd64 /usr/local/bin/helmfile
+brew install helmfile
 ```
 
 ### **Kubernetes Platforms**
@@ -641,10 +568,7 @@ sudo mv helmfile_linux_amd64 /usr/local/bin/helmfile
 Amazon EKS clusters can be easily created with `eksctl`.
 
 ```bash
-TARBALL="eksctl_$(uname -s)_amd64.tar.gz"
-URL_PREFIX="https://github.com/weaveworks/eksctl/releases/latest/download"
-curl --silent --location "$URL_PREFIX/$TARBALL" | tar xz -C /tmp
-sudo mv /tmp/eksctl /usr/local/bin
+brew install eksctl
 ```
 
 Afterward, you can create a cluster:
